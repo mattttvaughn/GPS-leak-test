@@ -172,6 +172,8 @@ function resetSummaryPanel() {
   bySummaryField("samples").textContent = "0";
   bySummaryField("elapsed").textContent = "0s";
   bySummaryField("totalDistance").textContent = "0 m";
+  bySummaryField("latestHopDistance").textContent = "0 m";
+  bySummaryField("latestHopSpeed").textContent = "0 m/s";
   bySummaryField("avgSpeed").textContent = "0 m/s";
   bySummaryField("maxSpeed").textContent = "0 m/s";
   bySummaryField("largeJumps").textContent = "0";
@@ -239,9 +241,12 @@ function renderDebugTable(samples, metrics) {
 
 function renderSummary(samples, analysis) {
   const { metrics, risk } = analysis;
+  const latestPair = metrics.pairs[metrics.pairs.length - 1] ?? null;
   bySummaryField("samples").textContent = String(samples.length);
   bySummaryField("elapsed").textContent = `${(metrics.elapsedMs / 1000).toFixed(1)}s`;
   bySummaryField("totalDistance").textContent = formatMeters(metrics.totalDistance);
+  bySummaryField("latestHopDistance").textContent = latestPair ? formatMeters(latestPair.distanceMeters) : "0 m";
+  bySummaryField("latestHopSpeed").textContent = latestPair ? formatSpeed(latestPair.impliedSpeedMps) : "0 m/s";
   bySummaryField("avgSpeed").textContent = formatSpeed(metrics.averageImpliedSpeed);
   bySummaryField("maxSpeed").textContent = formatSpeed(metrics.maxImpliedSpeed);
   bySummaryField("largeJumps").textContent = String(metrics.largeJumpCount);
