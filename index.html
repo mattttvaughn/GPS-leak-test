@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Geolocation Spoofing Heuristic Checker</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <h1>Geolocation Spoofing Heuristic Checker</h1>
+      <p>
+        This browser-only demo requests location access, collects a stream of readings, and estimates spoof likelihood by
+        checking consistency over time.
+      </p>
+      <p class="muted">
+        Results are probabilistic, not definitive proof. Browsers do not expose a trusted "mock GPS" flag, so this tool only
+        estimates risk from behavioral inconsistencies.
+      </p>
+    </header>
+
+    <main class="layout">
+      <section class="card">
+        <h2>Controls</h2>
+        <div class="control-row">
+          <button id="startButton" type="button">Start location check</button>
+          <button id="stopButton" type="button" disabled>Stop</button>
+          <button id="clearButton" type="button">Clear session</button>
+        </div>
+        <p>
+          Permission state:
+          <strong id="permissionState">checking…</strong>
+        </p>
+        <p id="statusMessage" class="status">Waiting to start.</p>
+      </section>
+
+      <section class="card">
+        <h2>Live latest reading</h2>
+        <dl class="data-grid">
+          <dt>Latitude</dt>
+          <dd id="live-lat">-</dd>
+          <dt>Longitude</dt>
+          <dd id="live-lng">-</dd>
+          <dt>Accuracy (m)</dt>
+          <dd id="live-accuracy">-</dd>
+          <dt>Altitude</dt>
+          <dd id="live-altitude">-</dd>
+          <dt>Heading</dt>
+          <dd id="live-heading">-</dd>
+          <dt>Speed</dt>
+          <dd id="live-speed">-</dd>
+          <dt>Timestamp</dt>
+          <dd id="live-timestamp">-</dd>
+        </dl>
+      </section>
+
+      <section class="card">
+        <h2>Session summary</h2>
+        <dl class="data-grid">
+          <dt>Samples collected</dt>
+          <dd id="summary-samples">0</dd>
+          <dt>Total elapsed time</dt>
+          <dd id="summary-elapsed">0s</dd>
+          <dt>Total distance</dt>
+          <dd id="summary-totalDistance">0 m</dd>
+          <dt>Average implied speed</dt>
+          <dd id="summary-avgSpeed">0 m/s</dd>
+          <dt>Max implied speed</dt>
+          <dd id="summary-maxSpeed">0 m/s</dd>
+          <dt>Large jumps</dt>
+          <dd id="summary-largeJumps">0</dd>
+          <dt>Repeated identical coordinates</dt>
+          <dd id="summary-identicalCoords">0</dd>
+          <dt>Timestamp anomalies</dt>
+          <dd id="summary-timestampAnomalies">0</dd>
+          <dt>Accuracy variance</dt>
+          <dd id="summary-accuracyVariance">0</dd>
+          <dt>Odd/null field count</dt>
+          <dd id="summary-oddFields">0</dd>
+          <dt>Distance from getCurrentPosition baseline</dt>
+          <dd id="summary-baselineDelta">n/a</dd>
+        </dl>
+
+        <div class="risk-box">
+          <p>
+            Risk score:
+            <strong id="riskScore">0</strong>/100
+          </p>
+          <p>
+            Classification:
+            <strong id="classificationLabel">Not enough data</strong>
+          </p>
+        </div>
+
+        <h3>Reasons triggered</h3>
+        <ul id="reasonsList">
+          <li>Collect at least 4 samples across 15+ seconds for minimum viable analysis.</li>
+        </ul>
+      </section>
+
+      <section class="card full-width">
+        <h2>Debug sample table</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Timestamp</th>
+                <th>Lat</th>
+                <th>Lng</th>
+                <th>Accuracy</th>
+                <th>Altitude</th>
+                <th>Heading</th>
+                <th>Speed</th>
+                <th>Δt (ms)</th>
+                <th>Distance (m)</th>
+                <th>Implied speed (m/s)</th>
+              </tr>
+            </thead>
+            <tbody id="debugBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card full-width">
+        <h2>Test mode (mock scenarios)</h2>
+        <p class="muted">Run canned sample streams to verify analyzer behavior without live GPS.</p>
+        <div class="control-row">
+          <label for="mockCaseSelect">Scenario:</label>
+          <select id="mockCaseSelect"></select>
+          <button id="runMockCaseButton" type="button">Run selected case</button>
+          <button id="runAllMockButton" type="button">Run all cases</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Case</th>
+                <th>Risk</th>
+                <th>Label</th>
+                <th>Reasons</th>
+              </tr>
+            </thead>
+            <tbody id="mockResultsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <p>
+        Privacy: All sampling and analysis happen locally in this browser session. Coordinates are not sent anywhere in this MVP.
+      </p>
+    </footer>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
